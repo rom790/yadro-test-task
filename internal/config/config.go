@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"encoding/json"
@@ -7,7 +7,25 @@ import (
 	"time"
 )
 
-func processConfig(filePath string) (*ParsedConfig, error) {
+type Config struct {
+	Laps        int    `json:"laps"`
+	LapLen      int    `json:"lapLen"`
+	PenaltyLen  int    `json:"penaltyLen"`
+	FiringLines int    `josn:"firingLines"`
+	Start       string `json:"start"`
+	StartDelta  string `json:"startDelta"`
+}
+
+type ParsedConfig struct {
+	Laps        int
+	LapLen      int
+	PenaltyLen  int
+	FiringLines int
+	Start       time.Time
+	StartDelta  time.Duration
+}
+
+func ProcessConfig(filePath string) (*ParsedConfig, error) {
 	confFile, err := os.Open(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("Open config file error: %w\n", err)

@@ -1,32 +1,19 @@
-package main
+package event
 
 import (
 	"fmt"
+	configPkg "github.com/rom790/yadro-test-task/internal/config"
 	"os"
 	"sort"
 	"strings"
 	"time"
 )
 
-type Config struct {
-	Laps        int    `json:"laps"`
-	LapLen      int    `json:"lapLen"`
-	PenaltyLen  int    `json:"penaltyLen"`
-	FiringLines int    `josn:"firingLines"`
-	Start       string `json:"start"`
-	StartDelta  string `json:"startDelta"`
+func WriteEvent(ev string) {
+	fmt.Println(ev)
 }
 
-type ParsedConfig struct {
-	Laps        int
-	LapLen      int
-	PenaltyLen  int
-	FiringLines int
-	Start       time.Time
-	StartDelta  time.Duration
-}
-
-func writeReport(report []string, filePath string) error {
+func WriteReport(report []string, filePath string) error {
 	for _, comp := range report {
 		fmt.Println(comp)
 	}
@@ -40,7 +27,7 @@ func writeReport(report []string, filePath string) error {
 	return os.WriteFile(filePath, []byte(content), 0644)
 }
 
-func generateReport(competitors map[int]*Competitor, config *ParsedConfig) []string {
+func GenerateReport(competitors map[int]*Competitor, config *configPkg.ParsedConfig) []string {
 	var report []string
 	var sorted []*Competitor
 

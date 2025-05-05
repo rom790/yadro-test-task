@@ -1,3 +1,3 @@
-module github.com/rom790/biathlon-timing
+module github.com/rom790/yadro-test-task
 
 go 1.22.3

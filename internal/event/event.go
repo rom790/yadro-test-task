@@ -1,8 +1,9 @@
-package main
+package event
 
 import (
 	"bufio"
 	"fmt"
+	configPkg "github.com/rom790/yadro-test-task/internal/config"
 	"os"
 	"strconv"
 	"strings"
@@ -43,7 +44,7 @@ type PenaltyStats struct {
 	Count         int
 }
 
-func processEvents(filePath string, config *ParsedConfig, competitors map[int]*Competitor) error {
+func ProcessEvents(filePath string, config *configPkg.ParsedConfig, competitors map[int]*Competitor) error {
 	confFile, err := os.Open(filePath)
 	if err != nil {
 		return fmt.Errorf("Open events file error: %w\n", err)
@@ -55,7 +56,7 @@ func processEvents(filePath string, config *ParsedConfig, competitors map[int]*C
 
 	for scanner.Scan() {
 		line := scanner.Text()
-		event, _ := parseEvent(line)
+		event, _ := ParseEvent(line)
 
 		fmt.Println(formatOutput(event, formatters))
 
@@ -78,7 +79,7 @@ func processEvents(filePath string, config *ParsedConfig, competitors map[int]*C
 
 }
 
-func parseEvent(line string) (Event, error) {
+func ParseEvent(line string) (Event, error) {
 	fields := strings.Fields(line)
 	if len(fields) < 3 {
 		return Event{}, fmt.Errorf("invalid event line\n")
@@ -113,7 +114,7 @@ func parseEvent(line string) (Event, error) {
 	}, nil
 
 }
-func handleEvent(ev Event, comp *Competitor, config *ParsedConfig) []Event {
+func handleEvent(ev Event, comp *Competitor, config *configPkg.ParsedConfig) []Event {
 	var outgoing []Event
 
 	switch ev.EventID {
