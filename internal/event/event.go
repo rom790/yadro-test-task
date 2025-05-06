@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	configPkg "github.com/rom790/yadro-test-task/internal/config"
+	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -44,10 +45,10 @@ type PenaltyStats struct {
 	Count         int
 }
 
-func ProcessEvents(filePath string, config *configPkg.ParsedConfig, competitors map[int]*Competitor) error {
+func ProcessEvents(filePath string, config *configPkg.ParsedConfig, competitors map[int]*Competitor, w io.Writer) error {
 	confFile, err := os.Open(filePath)
 	if err != nil {
-		return fmt.Errorf("Open events file error: %w\n", err)
+		return fmt.Errorf("open events file error: %w", err)
 	}
 	defer confFile.Close()
 
@@ -58,7 +59,7 @@ func ProcessEvents(filePath string, config *configPkg.ParsedConfig, competitors 
 		line := scanner.Text()
 		event, _ := ParseEvent(line)
 
-		fmt.Println(formatOutput(event, formatters))
+		WriteEvent(formatOutput(event, formatters), w)
 
 		comp, exists := competitors[event.CompetitorID]
 		if !exists {
@@ -68,10 +69,10 @@ func ProcessEvents(filePath string, config *configPkg.ParsedConfig, competitors 
 			competitors[event.CompetitorID] = comp
 		}
 
-		outgoing := handleEvent(event, comp, config)
+		outgoing := HandleEvent(event, comp, config)
 
 		for _, outEv := range outgoing {
-			fmt.Println(formatOutput(outEv, formatters))
+			WriteEvent(formatOutput(outEv, formatters), w)
 		}
 
 	}
@@ -82,23 +83,23 @@ func ProcessEvents(filePath string, config *configPkg.ParsedConfig, competitors 
 func ParseEvent(line string) (Event, error) {
 	fields := strings.Fields(line)
 	if len(fields) < 3 {
-		return Event{}, fmt.Errorf("invalid event line\n")
+		return Event{}, fmt.Errorf("invalid event line")
 	}
 
 	evTime, err := parseEventTime(strings.Trim(fields[0], "[]"))
 	if err != nil {
-		return Event{}, fmt.Errorf("time parsing error: %w\n", err)
+		return Event{}, fmt.Errorf("time parsing error: %w", err)
 	}
 
 	var eventID, competitorID int
 	eventID, err = strconv.Atoi(fields[1])
 	if err != nil {
-		return Event{}, fmt.Errorf("event ID parsing error: %w\n", err)
+		return Event{}, fmt.Errorf("event ID parsing error: %w", err)
 	}
 
 	competitorID, err = strconv.Atoi(fields[2])
 	if err != nil {
-		return Event{}, fmt.Errorf("competitor ID parsing error: %w\n", err)
+		return Event{}, fmt.Errorf("competitor ID parsing error: %w", err)
 	}
 
 	var extrParams []string
@@ -114,7 +115,7 @@ func ParseEvent(line string) (Event, error) {
 	}, nil
 
 }
-func handleEvent(ev Event, comp *Competitor, config *configPkg.ParsedConfig) []Event {
+func HandleEvent(ev Event, comp *Competitor, config *configPkg.ParsedConfig) []Event {
 	var outgoing []Event
 
 	switch ev.EventID {

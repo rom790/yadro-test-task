@@ -3,28 +3,20 @@ package event
 import (
 	"fmt"
 	configPkg "github.com/rom790/yadro-test-task/internal/config"
-	"os"
+	"io"
 	"sort"
 	"strings"
 	"time"
 )
 
-func WriteEvent(ev string) {
-	fmt.Println(ev)
+func WriteEvent(ev string, w io.Writer) {
+	fmt.Fprintln(w, ev)
 }
 
-func WriteReport(report []string, filePath string) error {
+func WriteReport(report []string, w io.Writer) {
 	for _, comp := range report {
-		fmt.Println(comp)
+		fmt.Fprintln(w, comp)
 	}
-
-	if filePath == "" {
-		return nil
-	}
-
-	content := strings.Join(report, "\n")
-
-	return os.WriteFile(filePath, []byte(content), 0644)
 }
 
 func GenerateReport(competitors map[int]*Competitor, config *configPkg.ParsedConfig) []string {

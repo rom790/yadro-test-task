@@ -1,10 +1,13 @@
 package main
 
 import (
+	"io"
+	"log"
+	"os"
+
 	configPkg "github.com/rom790/yadro-test-task/internal/config"
 	eventPkg "github.com/rom790/yadro-test-task/internal/event"
 	flags "github.com/rom790/yadro-test-task/internal/flags"
-	"log"
 )
 
 func main() {
@@ -26,15 +29,28 @@ func main() {
 
 	competitors := make(map[int]*eventPkg.Competitor)
 
-	err = eventPkg.ProcessEvents(args.EventsPath, config, competitors)
+	var logFile io.Writer
+	logFile, err = os.Create(args.LogFilePath)
+	if err != nil {
+		log.Printf("Creating log file error: %v\n", err)
+		return
+	}
+
+	err = eventPkg.ProcessEvents(args.EventsPath, config, competitors, logFile)
 	if err != nil {
 		log.Printf("processing events error: %v\n", err)
+		return
 	}
 
 	report := eventPkg.GenerateReport(competitors, config)
 
-	err = eventPkg.WriteReport(report, args.OutputPath)
+	var reportFile io.Writer
+	reportFile, err = os.Create(args.ReportPath)
 	if err != nil {
-		log.Printf("write report error: %v\n", err)
+		log.Printf("Creating report file error: %v\n", err)
+		return
 	}
+
+	eventPkg.WriteReport(report, reportFile)
+
 }

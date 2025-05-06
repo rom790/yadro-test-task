@@ -31,9 +31,7 @@ func formatDurationToStr(d time.Duration) string {
 
 	return fmt.Sprintf("%02d:%02d:%02d.%03d", hours, minutes, seconds, milliseconds)
 }
-func outputEvent(ev Event, formatters map[int]func(Event, string) string) {
-	fmt.Println(formatOutput(ev, formatters))
-}
+
 func initFormatters() map[int]func(Event, string) string {
 	return map[int]func(Event, string) string{
 		1: func(ev Event, t string) string {
