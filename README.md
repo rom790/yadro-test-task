@@ -56,6 +56,3 @@ go build -o biathlon-simulator ./cmd
 go test ./...
 ```
 
-## 📜 Лицензия
-
-MIT
